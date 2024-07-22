@@ -12,8 +12,7 @@
 
 if (!window.chem || !util.Vec2 || !util.Pool)
     throw new Error("Vec2, Pool should be defined first");
-chem.SGroup = function (type)
-{
+chem.SGroup = function (type) {
     if (!type || !(type in chem.SGroup.TYPES))
         throw new Error("Invalid or unsupported s-group type");
 
@@ -22,8 +21,8 @@ chem.SGroup = function (type)
     chem.SGroup.equip(this, type);
     this.label = -1;
     this.bracketBox = null;
-        this.bracketDir = new util.Vec2(1,0);
-        this.areas = [];
+    this.bracketDir = new util.Vec2(1, 0);
+    this.areas = [];
 
     this.highlight = false;
     this.highlighting = null;
@@ -39,22 +38,22 @@ chem.SGroup = function (type)
     this.data = {
         'mul': 1, // multiplication count for MUL group
         'connectivity': 'ht', // head-to-head, head-to-tail or either-unknown
-        'name' : '',
-        'subscript' : 'n',
+        'name': '',
+        'subscript': 'n',
 
         // data s-group fields
-        'attached' : false,
-        'absolute' : true,
-        'showUnits' : false,
-        'nCharsToDisplay' : -1,
-        'tagChar' : '',
-        'daspPos' : 1,
-        'fieldType' : 'F',
-        'fieldName' : '',
-        'fieldValue' : '',
-        'units' : '',
-        'query' : '',
-        'queryOp' : ''
+        'attached': false,
+        'absolute': true,
+        'showUnits': false,
+        'nCharsToDisplay': -1,
+        'tagChar': '',
+        'daspPos': 1,
+        'fieldType': 'F',
+        'fieldName': '',
+        'fieldValue': '',
+        'units': '',
+        'query': '',
+        'queryOp': ''
     }
 };
 
@@ -100,8 +99,7 @@ chem.SGroup.numberArrayToString = function (numbers, map) {
     return str;
 };
 
-chem.SGroup.addGroup = function (mol, sg, atomMap)
-{
+chem.SGroup.addGroup = function (mol, sg, atomMap) {
     // add the group to the molecule
     sg.id = mol.sgroups.add(sg);
 
@@ -144,7 +142,7 @@ chem.SGroup.filterAtoms = function (atoms, map) {
     var newAtoms = [];
     for (var i = 0; i < atoms.length; ++i) {
         var aid = atoms[i];
-        if (typeof(map[aid]) != "number") {
+        if (typeof (map[aid]) != "number") {
             newAtoms.push(aid);
         } else if (map[aid] >= 0) {
             newAtoms.push(map[aid]);
@@ -163,13 +161,11 @@ chem.SGroup.removeNegative = function (atoms) {
     return newAtoms;
 };
 
-chem.SGroup.filter = function (mol, sg, atomMap)
-{
+chem.SGroup.filter = function (mol, sg, atomMap) {
     sg.atoms = chem.SGroup.removeNegative(chem.SGroup.filterAtoms(sg.atoms, atomMap));
 };
 
-chem.SGroup.clone = function (sgroup, aidMap, bidMap)
-{
+chem.SGroup.clone = function (sgroup, aidMap, bidMap) {
     var cp = new chem.SGroup(sgroup.type);
 
     for (var field in sgroup.data) { // TODO: remove all non-primitive properties from 'data'
@@ -184,13 +180,11 @@ chem.SGroup.clone = function (sgroup, aidMap, bidMap)
     return cp;
 };
 
-chem.SGroup.addAtom = function (sgroup, aid)
-{
+chem.SGroup.addAtom = function (sgroup, aid) {
     sgroup.atoms.push(aid);
 };
 
-chem.SGroup.removeAtom = function (sgroup, aid)
-{
+chem.SGroup.removeAtom = function (sgroup, aid) {
     for (var i = 0; i < sgroup.atoms.length; ++i) {
         if (sgroup.atoms[i] === aid) {
             sgroup.atoms.splice(i, 1);
@@ -201,7 +195,7 @@ chem.SGroup.removeAtom = function (sgroup, aid)
 };
 
 chem.SGroup.getCrossBonds = function (inBonds, xBonds, mol, parentAtomSet) {
-    mol.bonds.each(function(bid, bond){
+    mol.bonds.each(function (bid, bond) {
         if (util.Set.contains(parentAtomSet, bond.begin) && util.Set.contains(parentAtomSet, bond.end)) {
             if (!util.isNull(inBonds))
                 inBonds.push(bid);
@@ -212,7 +206,7 @@ chem.SGroup.getCrossBonds = function (inBonds, xBonds, mol, parentAtomSet) {
     }, this);
 };
 
-chem.SGroup.bracketPos = function(sg, render, mol, xbonds) {
+chem.SGroup.bracketPos = function (sg, render, mol, xbonds) {
     var atoms = sg.atoms;
     if (!xbonds || xbonds.length !== 2) {
         sg.bracketDir = new util.Vec2(1, 0);
@@ -226,7 +220,7 @@ chem.SGroup.bracketPos = function(sg, render, mol, xbonds) {
 
     var bb = null;
     var contentBoxes = [];
-    util.each(atoms, function(aid) {
+    util.each(atoms, function (aid) {
         var atom = mol.atoms.get(aid);
         var bba = render ? render.ctab.atoms.get(aid).visel.boundingBox : null;
         var pos = new util.Vec2(atom.pp);
@@ -239,17 +233,17 @@ chem.SGroup.bracketPos = function(sg, render, mol, xbonds) {
         }
         contentBoxes.push(bba);
     }, this);
-    util.each(mol.sGroupForest.children.get(sg.id), function(sgid) {
+    util.each(mol.sGroupForest.children.get(sg.id), function (sgid) {
         var bba = render ? render.ctab.sgroups.get(sgid).visel.boundingBox : null;
         if (util.isNull(bba))
             return; // TODO: use object box instead
         bba = bba.translate((render.offset || new util.Vec2()).negated()).transform(render.scaled2obj, render);
         contentBoxes.push(bba);
     }, this);
-    util.each(contentBoxes, function(bba) {
+    util.each(contentBoxes, function (bba) {
         var bbb = null;
-        util.each([bba.p0.x, bba.p1.x], function(x) {
-            util.each([bba.p0.y, bba.p1.y], function(y) {
+        util.each([bba.p0.x, bba.p1.x], function (x) {
+            util.each([bba.p0.y, bba.p1.y], function (y) {
                 var v = new util.Vec2(x, y);
                 var p = new util.Vec2(util.Vec2.dot(v, d), util.Vec2.dot(v, n));
                 bbb = util.isNull(bbb) ? new util.Box2Abs(p, p) : bbb.include(p);
@@ -267,20 +261,20 @@ chem.SGroup.drawBrackets = function (set, render, sg, xbonds, atomSet, bb, d, n,
     var brackets = chem.SGroup.getBracketParameters(render.ctab.molecule, xbonds, atomSet, bb, d, n, render, sg.id);
     var ir = -1;
     for (var i = 0; i < brackets.length; ++i) {
-       var bracket = brackets[i];
-       var path = chem.SGroup.drawBracket(render, render.paper, render.styles, bracket.d, bracket.n, bracket.c, bracket.w, bracket.h);
-       set.push(path);
-       if (ir < 0 || brackets[ir].d.x < bracket.d.x || (brackets[ir].d.x == bracket.d.x && brackets[ir].d.y > bracket.d.y))
-           ir = i;
+        var bracket = brackets[i];
+        var path = chem.SGroup.drawBracket(render, render.paper, render.styles, bracket.d, bracket.n, bracket.c, bracket.w, bracket.h);
+        set.push(path);
+        if (ir < 0 || brackets[ir].d.x < bracket.d.x || (brackets[ir].d.x == bracket.d.x && brackets[ir].d.y > bracket.d.y))
+            ir = i;
     }
     var bracketR = brackets[ir];
-    var renderIndex = function(text, shift) {
+    var renderIndex = function (text, shift) {
         var indexPos = render.ps(bracketR.c.addScaled(bracketR.n, shift * bracketR.h));
         var indexPath = render.paper.text(indexPos.x, indexPos.y, text)
-        .attr({
-            'font' : render.settings.font,
-            'font-size' : render.settings.fontszsub
-        });
+            .attr({
+                'font': render.settings.font,
+                'font-size': render.settings.fontszsub
+            });
         if (indexAttribute)
             indexPath.attr(indexAttribute);
         var indexBox = util.Box2Abs.fromRelBox(rnd.relBox(indexPath.getBBox()));
@@ -299,8 +293,8 @@ chem.SGroup.drawBrackets = function (set, render, sg, xbonds, atomSet, bb, d, n,
 chem.SGroup.drawBracket = function (render, paper, styles, d, n, c, bracketWidth, bracketHeight) {
     bracketWidth = bracketWidth || 0.25;
     bracketHeight = bracketHeight || 1.0;
-    var a0 = c.addScaled(n, -0.5*bracketHeight);
-    var a1 = c.addScaled(n, 0.5*bracketHeight);
+    var a0 = c.addScaled(n, -0.5 * bracketHeight);
+    var a1 = c.addScaled(n, 0.5 * bracketHeight);
     var b0 = a0.addScaled(d, -bracketWidth);
     var b1 = a1.addScaled(d, -bracketWidth);
 
@@ -315,10 +309,10 @@ chem.SGroup.drawBracket = function (render, paper, styles, d, n, c, bracketWidth
 }
 
 chem.SGroup.getBracketParameters = function (mol, xbonds, atomSet, bb, d, n, render, id) {
-    var bracketParams = function(c, d, w, h) {
+    var bracketParams = function (c, d, w, h) {
         this.c = c;
         this.d = d;
-        this.n = d.rotateSC(1,0);
+        this.n = d.rotateSC(1, 0);
         this.w = w;
         this.h = h;
     }
@@ -328,8 +322,8 @@ chem.SGroup.getBracketParameters = function (mol, xbonds, atomSet, bb, d, n, ren
             d = d || new util.Vec2(1, 0);
             n = n || d.rotateSC(1, 0);
             var bracketWidth = Math.min(0.25, bb.sz().x * 0.3);
-            var cl = util.Vec2.lc2(d, bb.p0.x, n, 0.5*(bb.p0.y+bb.p1.y));
-            var cr = util.Vec2.lc2(d, bb.p1.x, n, 0.5*(bb.p0.y+bb.p1.y));
+            var cl = util.Vec2.lc2(d, bb.p0.x, n, 0.5 * (bb.p0.y + bb.p1.y));
+            var cr = util.Vec2.lc2(d, bb.p1.x, n, 0.5 * (bb.p0.y + bb.p1.y));
             var bracketHeight = bb.sz().y;
 
             brackets.push(new bracketParams(cl, d.negated(), bracketWidth, bracketHeight), new bracketParams(cr, d, bracketWidth, bracketHeight));
@@ -338,9 +332,9 @@ chem.SGroup.getBracketParameters = function (mol, xbonds, atomSet, bb, d, n, ren
         (function () {
             var b1 = mol.bonds.get(xbonds[0]), b2 = mol.bonds.get(xbonds[1]);
             var cl0 = b1.getCenter(mol), cr0 = b2.getCenter(mol), tl = -1, tr = -1, tt = -1, tb = -1, cc = util.Vec2.centre(cl0, cr0);
-            var dr = util.Vec2.diff(cr0, cl0).normalized(), dl = dr.negated(), dt = dr.rotateSC(1,0), db = dt.negated();
+            var dr = util.Vec2.diff(cr0, cl0).normalized(), dl = dr.negated(), dt = dr.rotateSC(1, 0), db = dt.negated();
 
-            util.each(mol.sGroupForest.children.get(id), function(sgid) {
+            util.each(mol.sGroupForest.children.get(id), function (sgid) {
                 var bba = render ? render.ctab.sgroups.get(sgid).visel.boundingBox : null;
                 if (util.isNull(bba))
                     return; // TODO: use object box instead
@@ -355,7 +349,7 @@ chem.SGroup.getBracketParameters = function (mol, xbonds, atomSet, bb, d, n, ren
             tt = Math.max(Math.max(tt, tb) + 0.1, 0);
             var bracketWidth = 0.25, bracketHeight = 1.5 + tt;
             brackets.push(new bracketParams(cl0.addScaled(dl, tl), dl, bracketWidth, bracketHeight),
-            new bracketParams(cr0.addScaled(dr, tr), dr, bracketWidth, bracketHeight));
+                new bracketParams(cr0.addScaled(dr, tr), dr, bracketWidth, bracketHeight));
         })();
 
     } else {
@@ -371,8 +365,7 @@ chem.SGroup.getBracketParameters = function (mol, xbonds, atomSet, bb, d, n, ren
     return brackets;
 };
 
-chem.SGroup.getObjBBox = function (atoms, mol)
-{
+chem.SGroup.getObjBBox = function (atoms, mol) {
     if (atoms.length == 0)
         throw new Error("Atom list is empty");
 
@@ -406,7 +399,7 @@ chem.SGroup.getAtoms = function (mol, sg) {
     if (!sg.allAtoms)
         return sg.atoms;
     var atoms = [];
-    mol.atoms.each(function(aid){
+    mol.atoms.each(function (aid) {
         atoms.push(aid);
     });
     return atoms;
@@ -415,7 +408,7 @@ chem.SGroup.getAtoms = function (mol, sg) {
 chem.SGroup.getBonds = function (mol, sg) {
     var atoms = chem.SGroup.getAtoms(mol, sg);
     var bonds = [];
-    mol.bonds.each(function(bid, bond){
+    mol.bonds.each(function (bid, bond) {
         if (atoms.indexOf(bond.begin) >= 0 && atoms.indexOf(bond.end) >= 0) bonds.push(bid);
     });
     return bonds;
@@ -423,17 +416,17 @@ chem.SGroup.getBonds = function (mol, sg) {
 
 chem.SGroup.GroupMul = {
     draw: function (remol) {
-            var render = remol.render;
-            var set = render.paper.set();
-            var inBonds = [], xBonds = [];
-            var atomSet = util.Set.fromList(this.atoms);
-            chem.SGroup.getCrossBonds(inBonds, xBonds, remol.molecule, atomSet);
-            chem.SGroup.bracketPos(this, render, remol.molecule, xBonds);
-            var bb = this.bracketBox;
-            var d = this.bracketDir, n = d.rotateSC(1, 0);
-            this.areas = [bb];
-            chem.SGroup.drawBrackets(set, render, this, xBonds, atomSet, bb, d, n, this.data.mul);
-            return set;
+        var render = remol.render;
+        var set = render.paper.set();
+        var inBonds = [], xBonds = [];
+        var atomSet = util.Set.fromList(this.atoms);
+        chem.SGroup.getCrossBonds(inBonds, xBonds, remol.molecule, atomSet);
+        chem.SGroup.bracketPos(this, render, remol.molecule, xBonds);
+        var bb = this.bracketBox;
+        var d = this.bracketDir, n = d.rotateSC(1, 0);
+        this.areas = [bb];
+        chem.SGroup.drawBrackets(set, render, this, xBonds, atomSet, bb, d, n, this.data.mul);
+        return set;
     },
 
     saveToMolfile: function (mol, sgMap, atomMap, bondMap) {
@@ -450,92 +443,91 @@ chem.SGroup.GroupMul = {
     },
 
     prepareForSaving: function (mol) {
-            var j;
-            this.atoms.sort();
-            this.atomSet = util.Set.fromList(this.atoms);
-            this.parentAtomSet = util.Set.clone(this.atomSet);
-            var inBonds = [];
-            var xBonds = [];
+        var j;
+        this.atoms.sort();
+        this.atomSet = util.Set.fromList(this.atoms);
+        this.parentAtomSet = util.Set.clone(this.atomSet);
+        var inBonds = [];
+        var xBonds = [];
 
-            mol.bonds.each(function(bid, bond){
-                if (util.Set.contains(this.parentAtomSet, bond.begin) && util.Set.contains(this.parentAtomSet, bond.end))
-                    inBonds.push(bid);
-                else if (util.Set.contains(this.parentAtomSet, bond.begin) || util.Set.contains(this.parentAtomSet,bond.end))
-                    xBonds.push(bid);
-            }, this);
-            if (xBonds.length != 0 && xBonds.length != 2)
-                throw {
-                    'id':this.id,
-                    'error-type':'cross-bond-number',
-                    'message':"Unsupported cross-bonds number"
-                };
+        mol.bonds.each(function (bid, bond) {
+            if (util.Set.contains(this.parentAtomSet, bond.begin) && util.Set.contains(this.parentAtomSet, bond.end))
+                inBonds.push(bid);
+            else if (util.Set.contains(this.parentAtomSet, bond.begin) || util.Set.contains(this.parentAtomSet, bond.end))
+                xBonds.push(bid);
+        }, this);
+        if (xBonds.length != 0 && xBonds.length != 2)
+            throw {
+                'id': this.id,
+                'error-type': 'cross-bond-number',
+                'message': "Unsupported cross-bonds number"
+            };
 
-            var xAtom1 = -1,
+        var xAtom1 = -1,
             xAtom2 = -1;
-            var crossBond = null;
-            if (xBonds.length == 2) {
-                var bond1 = mol.bonds.get(xBonds[0]);
-                if (util.Set.contains(this.parentAtomSet, bond1.begin)) {
-                    xAtom1 = bond1.begin;
-                } else {
-                    xAtom1 = bond1.end;
-                }
-                var bond2 = mol.bonds.get(xBonds[1]);
-                if (util.Set.contains(this.parentAtomSet, bond2.begin)) {
-                    xAtom2 = bond2.begin;
-                } else {
-                    xAtom2 = bond2.end;
-                }
-                crossBond = bond2;
+        var crossBond = null;
+        if (xBonds.length == 2) {
+            var bond1 = mol.bonds.get(xBonds[0]);
+            if (util.Set.contains(this.parentAtomSet, bond1.begin)) {
+                xAtom1 = bond1.begin;
+            } else {
+                xAtom1 = bond1.end;
             }
-
-            var amap = null;
-            var tailAtom = xAtom1;
-
-            var newAtoms = [];
-            for (j = 0; j < this.data.mul - 1; ++j) {
-                amap = {};
-                util.each(this.atoms, function(aid) {
-                    var atom = mol.atoms.get(aid);
-                    var aid2 = mol.atoms.add(new chem.Struct.Atom(atom));
-                    newAtoms.push(aid2);
-                    this.atomSet[aid2] = 1;
-                    amap[aid] = aid2;
-                }, this);
-                util.each(inBonds, function(bid) {
-                    var bond = mol.bonds.get(bid);
-                    var newBond = new chem.Struct.Bond(bond);
-                    newBond.begin = amap[newBond.begin];
-                    newBond.end = amap[newBond.end];
-                    mol.bonds.add(newBond);
-                }, this);
-                if (crossBond != null) {
-                    var newCrossBond = new chem.Struct.Bond(crossBond);
-                    newCrossBond.begin = tailAtom;
-                    newCrossBond.end = amap[xAtom2];
-                    mol.bonds.add(newCrossBond);
-                    tailAtom = amap[xAtom1];
-                }
+            var bond2 = mol.bonds.get(xBonds[1]);
+            if (util.Set.contains(this.parentAtomSet, bond2.begin)) {
+                xAtom2 = bond2.begin;
+            } else {
+                xAtom2 = bond2.end;
             }
+            crossBond = bond2;
+        }
 
-            util.each(newAtoms, function(aid) {
-                util.each(mol.sGroupForest.getPathToRoot(this.id).reverse(), function(sgid) {
-                    mol.atomAddToSGroup(sgid, aid);
-                }, this);
+        var amap = null;
+        var tailAtom = xAtom1;
+
+        var newAtoms = [];
+        for (j = 0; j < this.data.mul - 1; ++j) {
+            amap = {};
+            util.each(this.atoms, function (aid) {
+                var atom = mol.atoms.get(aid);
+                var aid2 = mol.atoms.add(new chem.Struct.Atom(atom));
+                newAtoms.push(aid2);
+                this.atomSet[aid2] = 1;
+                amap[aid] = aid2;
             }, this);
-            if (tailAtom >= 0) {
-                var xBond2 = mol.bonds.get(xBonds[0]);
-                if (xBond2.begin == xAtom1)
-                    xBond2.begin = tailAtom;
-                else
-                    xBond2.end = tailAtom;
+            util.each(inBonds, function (bid) {
+                var bond = mol.bonds.get(bid);
+                var newBond = new chem.Struct.Bond(bond);
+                newBond.begin = amap[newBond.begin];
+                newBond.end = amap[newBond.end];
+                mol.bonds.add(newBond);
+            }, this);
+            if (crossBond != null) {
+                var newCrossBond = new chem.Struct.Bond(crossBond);
+                newCrossBond.begin = tailAtom;
+                newCrossBond.end = amap[xAtom2];
+                mol.bonds.add(newCrossBond);
+                tailAtom = amap[xAtom1];
             }
+        }
 
-            this.bonds = xBonds;
+        util.each(newAtoms, function (aid) {
+            util.each(mol.sGroupForest.getPathToRoot(this.id).reverse(), function (sgid) {
+                mol.atomAddToSGroup(sgid, aid);
+            }, this);
+        }, this);
+        if (tailAtom >= 0) {
+            var xBond2 = mol.bonds.get(xBonds[0]);
+            if (xBond2.begin == xAtom1)
+                xBond2.begin = tailAtom;
+            else
+                xBond2.end = tailAtom;
+        }
+
+        this.bonds = xBonds;
     },
 
-    postLoad: function (mol, atomMap)
-    {
+    postLoad: function (mol, atomMap) {
         this.data.mul = this.data.subscript - 0;
         var atomReductionMap = {};
 
@@ -551,7 +543,7 @@ chem.SGroup.GroupMul = {
                 if (this.patoms[m] < 0) {
                     throw new Error("parent atom missing");
                 }
-//                mol.atoms.get(raid).pp.y -= 3*k; // for debugging purposes
+                //                mol.atoms.get(raid).pp.y -= 3*k; // for debugging purposes
                 atomReductionMap[raid] = this.patoms[m]; // "merge" atom in parent
             }
         }
@@ -560,7 +552,7 @@ chem.SGroup.GroupMul = {
         var patomsMap = util.identityMap(this.patoms);
 
         var bondsToRemove = [];
-        mol.bonds.each(function(bid, bond){
+        mol.bonds.each(function (bid, bond) {
             var beginIn = bond.begin in atomReductionMap;
             var endIn = bond.end in atomReductionMap;
             // if both adjacent atoms of a bond are to be merged, remove it
@@ -568,7 +560,7 @@ chem.SGroup.GroupMul = {
                 || beginIn && bond.end in patomsMap
                 || endIn && bond.begin in patomsMap) {
                 bondsToRemove.push(bid);
-            // if just one atom is merged, modify the bond accordingly
+                // if just one atom is merged, modify the bond accordingly
             } else if (beginIn) {
                 bond.begin = atomReductionMap[bond.begin];
             } else if (endIn) {
@@ -591,21 +583,21 @@ chem.SGroup.GroupMul = {
 
 chem.SGroup.GroupSru = {
     draw: function (remol) {
-            var render = remol.render;
-            var set = render.paper.set();
-            var inBonds = [], xBonds = [];
-            var atomSet = util.Set.fromList(this.atoms);
-            chem.SGroup.getCrossBonds(inBonds, xBonds, remol.molecule, atomSet);
-            chem.SGroup.bracketPos(this, render, remol.molecule, xBonds);
-            var bb = this.bracketBox;
-            var d = this.bracketDir, n = d.rotateSC(1, 0);
-            this.areas = [bb];
-            var connectivity = this.data.connectivity || 'eu';
-            if (connectivity == 'ht')
-                connectivity = '';
-            var subscript = this.data.subscript || 'n';
-            chem.SGroup.drawBrackets(set, render, this, xBonds, atomSet, bb, d, n, subscript, connectivity);
-            return set;
+        var render = remol.render;
+        var set = render.paper.set();
+        var inBonds = [], xBonds = [];
+        var atomSet = util.Set.fromList(this.atoms);
+        chem.SGroup.getCrossBonds(inBonds, xBonds, remol.molecule, atomSet);
+        chem.SGroup.bracketPos(this, render, remol.molecule, xBonds);
+        var bb = this.bracketBox;
+        var d = this.bracketDir, n = d.rotateSC(1, 0);
+        this.areas = [bb];
+        var connectivity = this.data.connectivity || 'eu';
+        if (connectivity == 'ht')
+            connectivity = '';
+        var subscript = this.data.subscript || 'n';
+        chem.SGroup.drawBrackets(set, render, this, xBonds, atomSet, bb, d, n, subscript, connectivity);
+        return set;
     },
 
     saveToMolfile: function (mol, sgMap, atomMap, bondMap) {
@@ -620,15 +612,15 @@ chem.SGroup.GroupSru = {
 
     prepareForSaving: function (mol) {
         var xBonds = [];
-        mol.bonds.each(function(bid, bond){
+        mol.bonds.each(function (bid, bond) {
             var a1 = mol.atoms.get(bond.begin);
             var a2 = mol.atoms.get(bond.end);
             if (util.Set.contains(a1.sgs, this.id) && !util.Set.contains(a2.sgs, this.id) ||
                 util.Set.contains(a2.sgs, this.id) && !util.Set.contains(a1.sgs, this.id))
                 xBonds.push(bid);
-        },this);
+        }, this);
         if (xBonds.length != 0 && xBonds.length != 2)
-            throw {'id':this.id, 'error-type':'cross-bond-number', 'message':"Unsupported cross-bonds number"};
+            throw { 'id': this.id, 'error-type': 'cross-bond-number', 'message': "Unsupported cross-bonds number" };
         this.bonds = xBonds;
     },
 
@@ -639,19 +631,19 @@ chem.SGroup.GroupSru = {
 
 chem.SGroup.GroupSup = {
     draw: function (remol) {
-            var render = remol.render;
-            var set = render.paper.set();
-            var inBonds = [], xBonds = [];
-            var atomSet = util.Set.fromList(this.atoms);
-            chem.SGroup.getCrossBonds(inBonds, xBonds, remol.molecule, atomSet);
-            chem.SGroup.bracketPos(this, render, remol.molecule, xBonds);
-            var bb = this.bracketBox;
-            var d = this.bracketDir, n = d.rotateSC(1, 0);
-            this.areas = [bb];
-            chem.SGroup.drawBrackets(set, render, this, xBonds, atomSet, bb, d, n, this.data.name, null, {
-                'font-style' : 'italic'
-            });
-            return set;
+        var render = remol.render;
+        var set = render.paper.set();
+        var inBonds = [], xBonds = [];
+        var atomSet = util.Set.fromList(this.atoms);
+        chem.SGroup.getCrossBonds(inBonds, xBonds, remol.molecule, atomSet);
+        chem.SGroup.bracketPos(this, render, remol.molecule, xBonds);
+        var bb = this.bracketBox;
+        var d = this.bracketDir, n = d.rotateSC(1, 0);
+        this.areas = [bb];
+        chem.SGroup.drawBrackets(set, render, this, xBonds, atomSet, bb, d, n, this.data.name, null, {
+            'font-style': 'italic'
+        });
+        return set;
     },
 
     saveToMolfile: function (mol, sgMap, atomMap, bondMap) {
@@ -669,38 +661,38 @@ chem.SGroup.GroupSup = {
         // This code is also used for GroupSru and should be moved into a separate common method
         // It seems that such code should be used for any sgroup by this this should be checked
         var xBonds = [];
-        mol.bonds.each(function(bid, bond){
+        mol.bonds.each(function (bid, bond) {
             var a1 = mol.atoms.get(bond.begin);
             var a2 = mol.atoms.get(bond.end);
             if (util.Set.contains(a1.sgs, this.id) && !util.Set.contains(a2.sgs, this.id) ||
                 util.Set.contains(a2.sgs, this.id) && !util.Set.contains(a1.sgs, this.id))
                 xBonds.push(bid);
-        },this);
+        }, this);
         this.bonds = xBonds;
     },
 
     postLoad: function (mol, atomMap) {
         this.data.name = (this.data.subscript || '').strip();
-                this.data.subscript = '';
+        this.data.subscript = '';
     }
 };
 
 chem.SGroup.GroupGen = {
-        draw: function (remol) {
-            var render = remol.render;
-            var settings = render.settings;
-            var styles = render.styles;
-            var paper = render.paper;
-            var set = paper.set();
-            var inBonds = [], xBonds = [];
-            var atomSet = util.Set.fromList(this.atoms);
-            chem.SGroup.getCrossBonds(inBonds, xBonds, remol.molecule, atomSet);
-            chem.SGroup.bracketPos(this, render, remol.molecule, xBonds);
-            var bb = this.bracketBox;
-            var d = this.bracketDir, n = d.rotateSC(1, 0);
-            this.areas = [bb];
-            chem.SGroup.drawBrackets(set, render, this, xBonds, atomSet, bb, d, n);
-            return set;
+    draw: function (remol) {
+        var render = remol.render;
+        var settings = render.settings;
+        var styles = render.styles;
+        var paper = render.paper;
+        var set = paper.set();
+        var inBonds = [], xBonds = [];
+        var atomSet = util.Set.fromList(this.atoms);
+        chem.SGroup.getCrossBonds(inBonds, xBonds, remol.molecule, atomSet);
+        chem.SGroup.bracketPos(this, render, remol.molecule, xBonds);
+        var bb = this.bracketBox;
+        var d = this.bracketDir, n = d.rotateSC(1, 0);
+        this.areas = [bb];
+        chem.SGroup.drawBrackets(set, render, this, xBonds, atomSet, bb, d, n);
+        return set;
     },
 
     saveToMolfile: function (mol, sgMap, atomMap, bondMap) {
@@ -735,10 +727,10 @@ chem.SGroup.setPos = function (remol, sg, pos) {
 chem.SGroup.GroupDat = {
     showValue: function (paper, pos, sg, settings) {
         var name = paper.text(pos.x, pos.y, sg.data.fieldValue)
-        .attr({
-            'font' : settings.font,
-            'font-size' : settings.fontsz
-        });
+            .attr({
+                'font': settings.font,
+                'font-size': settings.fontsz
+            });
         return name;
     },
 
@@ -759,7 +751,7 @@ chem.SGroup.GroupDat = {
         var ps = this.pp.scaled(settings.scaleFactor);
 
         if (this.data.attached) {
-                for (i = 0; i < atoms.length; ++i) {
+            for (i = 0; i < atoms.length; ++i) {
                 var atom = remol.atoms.get(atoms[i]);
                 var p = render.ps(atom.a.pp);
                 var bb = atom.visel.boundingBox;
@@ -798,26 +790,26 @@ chem.SGroup.GroupDat = {
         var lines = [];
         lines = lines.concat(chem.SGroup.makeAtomBondLines('SAL', idstr, this.atoms, atomMap));
         var sdtLine = 'M  SDT ' + idstr +
-        ' ' + util.stringPadded(data.fieldName, 30, true) +
-        util.stringPadded(data.fieldType, 2) +
-        util.stringPadded(data.units, 20, true) +
-        util.stringPadded(data.query, 2) +
-        util.stringPadded(data.queryOp, 3);
+            ' ' + util.stringPadded(data.fieldName, 30, true) +
+            util.stringPadded(data.fieldType, 2) +
+            util.stringPadded(data.units, 20, true) +
+            util.stringPadded(data.query, 2) +
+            util.stringPadded(data.queryOp, 3);
         lines.push(sdtLine);
         var sddLine = 'M  SDD ' + idstr +
-        ' ' + util.paddedFloat(pp.x, 10, 4) + util.paddedFloat(-pp.y, 10, 4) +
-        '    ' + // ' eee'
-        (data.attached ? 'A' : 'D') + // f
-        (data.absolute ? 'A' : 'R') + // g
-        (data.showUnits ? 'U' : ' ') + // h
-        '   ' + //  i
-        (data.nCharnCharsToDisplay >= 0 ? util.paddedInt(data.nCharnCharsToDisplay, 3) : 'ALL') + // jjj
-        '  1   ' + // 'kkk ll '
-        util.stringPadded(data.tagChar, 1) + // m
-        '  ' + util.paddedInt(data.daspPos, 1) + // n
-        '  '; // oo
+            ' ' + util.paddedFloat(pp.x, 10, 4) + util.paddedFloat(-pp.y, 10, 4) +
+            '    ' + // ' eee'
+            (data.attached ? 'A' : 'D') + // f
+            (data.absolute ? 'A' : 'R') + // g
+            (data.showUnits ? 'U' : ' ') + // h
+            '   ' + //  i
+            (data.nCharnCharsToDisplay >= 0 ? util.paddedInt(data.nCharnCharsToDisplay, 3) : 'ALL') + // jjj
+            '  1   ' + // 'kkk ll '
+            util.stringPadded(data.tagChar, 1) + // m
+            '  ' + util.paddedInt(data.daspPos, 1) + // n
+            '  '; // oo
         lines.push(sddLine);
-        data.fieldValue.replace(/[\r\n|\n|\r]*$/, '').split(/\r\n|\n|\r/).each(function(str) {
+        data.fieldValue.replace(/[\r\n|\n|\r]*$/, '').split(/\r\n|\n|\r/).each(function (str) {
             var charsPerLine = 69;
             while (str.length > charsPerLine) {
                 lines.push('M  SCD ' + idstr + ' ' + str.slice(0, charsPerLine));
@@ -837,7 +829,7 @@ chem.SGroup.GroupDat = {
         if (!this.data.absolute)
             this.pp = this.pp.add(chem.SGroup.getMassCentre(mol, this.atoms));
         if (allAtomsInGroup &&
-            (    this.data.fieldName == 'MDLBG_FRAGMENT_STEREO' ||
+            (this.data.fieldName == 'MDLBG_FRAGMENT_STEREO' ||
                 this.data.fieldName == 'MDLBG_FRAGMENT_COEFFICIENT' ||
                 this.data.fieldName == 'MDLBG_FRAGMENT_CHARGE')) {
             this.atoms = [];
@@ -863,7 +855,7 @@ chem.SGroupForest = function (molecule) {
 }
 
 // returns an array or s-group ids in the order of breadth-first search
-chem.SGroupForest.prototype.getSGroupsBFS = function() {
+chem.SGroupForest.prototype.getSGroupsBFS = function () {
     var order = [], queue = [], id = -1;
     queue = util.array(this.children.get(-1));
     while (queue.length > 0) {
@@ -874,25 +866,25 @@ chem.SGroupForest.prototype.getSGroupsBFS = function() {
     return order;
 }
 
-chem.SGroupForest.prototype.getAtomSets = function() {
-    return this.molecule.sgroups.map(function(sgid, sgroup){
+chem.SGroupForest.prototype.getAtomSets = function () {
+    return this.molecule.sgroups.map(function (sgid, sgroup) {
         return util.Set.fromList(sgroup.atoms);
     });
 }
 
-chem.SGroupForest.prototype.getAtomSetRelations = function(newId, atoms /* util.Set */, atomSets /* util.Map of util.Set */) {
+chem.SGroupForest.prototype.getAtomSetRelations = function (newId, atoms /* util.Set */, atomSets /* util.Map of util.Set */) {
     // find the lowest superset in the hierarchy
     var isStrictSuperset = new util.Map(), isSubset = new util.Map();
     var atomSets = this.getAtomSets();
     atomSets.unset(newId);
-    atomSets.each(function(id, atomSet) {
-       isSubset.set(id, util.Set.subset(atoms, atomSet));
-       isStrictSuperset.set(id, util.Set.subset(atomSet, atoms) && !util.Set.eq(atomSet, atoms));
+    atomSets.each(function (id, atomSet) {
+        isSubset.set(id, util.Set.subset(atoms, atomSet));
+        isStrictSuperset.set(id, util.Set.subset(atomSet, atoms) && !util.Set.eq(atomSet, atoms));
     }, this);
-    var parents = atomSets.findAll(function(id) {
+    var parents = atomSets.findAll(function (id) {
         if (!isSubset.get(id))
             return false;
-        if (util.find(this.children.get(id), function(childId) {
+        if (util.find(this.children.get(id), function (childId) {
             return isSubset.get(childId);
         }, this) >= 0) {
             return false;
@@ -900,7 +892,7 @@ chem.SGroupForest.prototype.getAtomSetRelations = function(newId, atoms /* util.
         return true;
     }, this);
     util.assert(parents.length <= 1); // there should be only one parent
-    var children = atomSets.findAll(function(id, set) {
+    var children = atomSets.findAll(function (id, set) {
         return isStrictSuperset.get(id) && !isStrictSuperset.get(this.parent.get(id));
     }, this);
     return {
@@ -909,7 +901,7 @@ chem.SGroupForest.prototype.getAtomSetRelations = function(newId, atoms /* util.
     };
 }
 
-chem.SGroupForest.prototype.getPathToRoot = function(sgid) {
+chem.SGroupForest.prototype.getPathToRoot = function (sgid) {
     var path = [];
     for (var id = sgid; id >= 0; id = this.parent.get(id)) {
         util.assert(path.indexOf(id) < 0, "SGroupForest: loop detected");
@@ -918,21 +910,21 @@ chem.SGroupForest.prototype.getPathToRoot = function(sgid) {
     return path;
 }
 
-chem.SGroupForest.prototype.validate = function() {
+chem.SGroupForest.prototype.validate = function () {
     var atomSets = this.getAtomSets();
-    this.molecule.sgroups.each(function(id) {
+    this.molecule.sgroups.each(function (id) {
         this.getPathToRoot(id); // this will throw an exception if there is a loop in the path to root
     }, this);
 
     var valid = true;
     // 1) child group's atom set is a subset of the parent one's
-    this.parent.each(function(id, parentId) {
+    this.parent.each(function (id, parentId) {
         if (parentId >= 0 && !util.Set.subset(atomSets.get(id), atomSets.get(parentId)))
             valid = false;
     }, this);
 
     // 2) siblings have disjoint atom sets
-    this.children.each(function(parentId) {
+    this.children.each(function (parentId) {
         var list = this.children.get(parentId);
         for (var i = 0; i < list.length; ++i)
             for (var j = i + 1; j < list.length; ++j)
@@ -942,7 +934,7 @@ chem.SGroupForest.prototype.validate = function() {
     return valid;
 }
 
-chem.SGroupForest.prototype.insert = function(id, parent /* int, optional */, children /* [int], optional */) {
+chem.SGroupForest.prototype.insert = function (id, parent /* int, optional */, children /* [int], optional */) {
     util.assert(!this.parent.has(id), "sgid already present in the forest");
     util.assert(!this.children.has(id), "sgid already present in the forest");
 
@@ -956,7 +948,7 @@ chem.SGroupForest.prototype.insert = function(id, parent /* int, optional */, ch
     }
 
     // TODO: make children Map<int, Set> instead of Map<int, []>?
-    util.each(children, function (childId){ // reset parent links
+    util.each(children, function (childId) { // reset parent links
         util.assert(util.arrayRemoveByValue(this.children.get(this.parent.get(childId)), childId) === 1);
         this.parent.set(childId, id);
     }, this);
@@ -964,16 +956,16 @@ chem.SGroupForest.prototype.insert = function(id, parent /* int, optional */, ch
     this.parent.set(id, parent);
     this.children.get(parent).push(id);
     util.assert(this.validate(), "s-group forest invalid");
-    return {parent: parent, children: children};
+    return { parent: parent, children: children };
 }
 
-chem.SGroupForest.prototype.remove = function(id) {
+chem.SGroupForest.prototype.remove = function (id) {
     util.assert(this.parent.has(id), "sgid is not in the forest");
     util.assert(this.children.has(id), "sgid is not in the forest");
 
     util.assert(this.validate(), "s-group forest invalid");
     var parentId = this.parent.get(id);
-    util.each(this.children.get(id), function (childId){ // reset parent links
+    util.each(this.children.get(id), function (childId) { // reset parent links
         this.parent.set(childId, parentId);
         this.children.get(parentId).push(childId);
     }, this);

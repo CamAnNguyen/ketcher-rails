@@ -1,67 +1,67 @@
 if (!window.Prototype)
-	throw new Error("Prototype.js should be loaded first");
+    throw new Error("Prototype.js should be loaded first");
 if (!window.rnd)
-	throw new Error("rnd should be defined prior to loading this file");
+    throw new Error("rnd should be defined prior to loading this file");
 if (!window.ui)
-	throw new Error("ui should be defined prior to loading this file");
+    throw new Error("ui should be defined prior to loading this file");
 
 rnd.ReaGenericsTable = function (clientArea, opts) {
-	opts = opts || {};
-	clientArea = $(clientArea);
+    opts = opts || {};
+    clientArea = $(clientArea);
     clientArea.style.width = '610px';
     clientArea.style.height = '390px';
-	clientArea.innerHTML = "";
+    clientArea.innerHTML = "";
 
-	this.onClick = function(text) {
+    this.onClick = function (text) {
         this.setSelection(text);
-	};
+    };
 
     this.elemHalfSz = new util.Vec2(22, 14);
     this.elemSz = this.elemHalfSz.scaled(2);
 
-	this.spacing = new util.Vec2(3, 3);
-	this.cornerRadius = 2;
-	this.orig = this.elemSz.scaled(0);
+    this.spacing = new util.Vec2(3, 3);
+    this.cornerRadius = 2;
+    this.orig = this.elemSz.scaled(0);
 
-	this.viewSz = new util.Vec2(clientArea['clientWidth'] || 100, clientArea['clientHeight'] || 100);
+    this.viewSz = new util.Vec2(clientArea['clientWidth'] || 100, clientArea['clientHeight'] || 100);
 
-	this.paper = new Raphael(clientArea, this.viewSz.x, this.viewSz.y);
-	this.bb = new util.Box2Abs(new util.Vec2(), this.viewSz);
+    this.paper = new Raphael(clientArea, this.viewSz.x, this.viewSz.y);
+    this.bb = new util.Box2Abs(new util.Vec2(), this.viewSz);
 
     this.bgColor = clientArea.getStyle('background-color');
-	this.fillColor = opts.fillColor || '#def';
-	this.fillColorSelected = opts.fillColorSelected || '#fcb';
-	this.frameColor = opts.frameColor || '#9ad';
-	this.frameThickness = opts.frameThickness || '1pt';
-	this.fontSize = opts.fontSize || 18;
-	this.fontType = opts.fontType || "Arial";
-	this.atomProps = null;
+    this.fillColor = opts.fillColor || '#def';
+    this.fillColorSelected = opts.fillColorSelected || '#fcb';
+    this.frameColor = opts.frameColor || '#9ad';
+    this.frameThickness = opts.frameThickness || '1pt';
+    this.fontSize = opts.fontSize || 18;
+    this.fontType = opts.fontType || "Arial";
+    this.atomProps = null;
 
-	this.frameAttrs = {
-        'fill':this.fillColor,
-        'stroke':this.frameColor,
-        'stroke-width':this.frameThickness
+    this.frameAttrs = {
+        'fill': this.fillColor,
+        'stroke': this.frameColor,
+        'stroke-width': this.frameThickness
     };
-	this.fontAttrs = {
+    this.fontAttrs = {
         'font-family': this.fontType,
         'font-size': this.fontSize
     };
     this.groupRectAttrs = {
-        'stroke' : 'lightgray',
-        'stroke-width' : '1px'
+        'stroke': 'lightgray',
+        'stroke-width': '1px'
     };
     this.labelTextAttrs = {
         'font-family': "Arial",
         'font-size': 13,
-        'fill' : 'gray'
+        'fill': 'gray'
     };
     this.labelRectAttrs = {
-        fill : this.bgColor,
-        stroke : this.bgColor
+        fill: this.bgColor,
+        stroke: this.bgColor
     };
     this.items = [];
 
-    var drawGroup = function(x, y, w, h, text, align) {
+    var drawGroup = function (x, y, w, h, text, align) {
         align = align || 'start';
         this.paper.rect(x, y, w, h, this.cornerRadius).attr(this.groupRectAttrs);
         var t = this.paper.text(
@@ -77,25 +77,25 @@ rnd.ReaGenericsTable = function (clientArea, opts) {
         this.paper.rect().attr(t.getBBox()).attr(this.labelRectAttrs);
         t.toFront();
     };
-    var drawLabel = function(x, y, text, align) {
+    var drawLabel = function (x, y, text, align) {
         this.paper.text(x, y, text).attr(this.labelTextAttrs).attr(
             'text-anchor',
             align == 'left' ? 'start' : align == 'right' ? 'end' : 'middle'
         );
     };
-    var drawButton = function(center, text) {
+    var drawButton = function (center, text) {
         var box = this.paper.rect(
             center.x - this.elemHalfSz.x, center.y - this.elemHalfSz.y, this.elemSz.x, this.elemSz.y, this.cornerRadius
         ).attr(this.frameAttrs);
         var label = this.paper.text(center.x, center.y, text).attr(this.fontAttrs);
         var self = this;
-        box.node.onclick = function() {
+        box.node.onclick = function () {
             self.onClick(text);
         };
-        label.node.onclick = function() {
+        label.node.onclick = function () {
             self.onClick(text);
         };
-        this.items.push({ text : text, box : box, label : label });
+        this.items.push({ text: text, box: box, label: label });
     };
 
     var zx = (this.spacing.x + this.elemSz.x);
@@ -182,11 +182,11 @@ rnd.ReaGenericsTable = function (clientArea, opts) {
 };
 
 rnd.ReaGenericsTable.prototype.getAtomProps = function () {
-	return this.atomProps;
+    return this.atomProps;
 };
 
-rnd.ReaGenericsTable.prototype.setSelection = function(selection) {
-    this.atomProps = { label : selection };
+rnd.ReaGenericsTable.prototype.setSelection = function (selection) {
+    this.atomProps = { label: selection };
     for (var i = 0; i < this.items.length; i++) {
         this.items[i].box.attr('fill', this.items[i].text == selection ? this.fillColorSelected : this.fillColor);
     }
@@ -194,28 +194,28 @@ rnd.ReaGenericsTable.prototype.setSelection = function(selection) {
 };
 
 
-ui.showReaGenericsTable = function(params) {
+ui.showReaGenericsTable = function (params) {
     if (!$('reagenerics_table').visible()) {
         params = params || {};
         ui.showDialog('reagenerics_table');
-        if (typeof(ui.reagenerics_table_obj) == 'undefined') {
+        if (typeof (ui.reagenerics_table_obj) == 'undefined') {
             ui.reagenerics_table_obj = new rnd.ReaGenericsTable('reagenerics_table_area', {
-                'fillColor':'#DADADA',
-                'fillColorSelected':'#FFFFFF',
-                'frameColor':'#E8E8E8',
-                'fontSize':18,
-                'buttonHalfSize':18
+                'fillColor': '#DADADA',
+                'fillColorSelected': '#FFFFFF',
+                'frameColor': '#E8E8E8',
+                'fontSize': 18,
+                'buttonHalfSize': 18
             }, true);
         }
         if (params.selection)
             ui.reagenerics_table_obj.setSelection(params.selection);
-        var _onOk = new Event.Handler('reagenerics_table_ok', 'click', undefined, function() {
+        var _onOk = new Event.Handler('reagenerics_table_ok', 'click', undefined, function () {
             if (!params || !('onOk' in params) || params['onOk'](ui.reagenerics_table_obj.getAtomProps())) {
                 _onOk.stop(); _onCancel.stop();
                 ui.hideDialog('reagenerics_table');
             }
         }).start();
-        var _onCancel = new Event.Handler('reagenerics_table_cancel', 'click', undefined, function() {
+        var _onCancel = new Event.Handler('reagenerics_table_cancel', 'click', undefined, function () {
             _onOk.stop(); _onCancel.stop();
             ui.hideDialog('reagenerics_table');
             if (params && 'onCancel' in params) params['onCancel']();
@@ -225,12 +225,11 @@ ui.showReaGenericsTable = function(params) {
 };
 
 
-ui.onClick_ReaGenericsTableButton = function ()
-{
+ui.onClick_ReaGenericsTableButton = function () {
     if (this.hasClassName('buttonDisabled'))
         return;
     ui.showReaGenericsTable({
-        onOk : function() {
+        onOk: function () {
             ui.selectMode('atom_reagenerics');
             return true;
         }

@@ -2,11 +2,11 @@ module Ketcherails
 
   class CustomTemplate < ActiveRecord::Base
     belongs_to :user
-    before_save :set_name, on: :create
+    before_save :set_name, if: :new_record?
 
     IMG_PATH = 'public/images/templates/'
     IMG_SIZE = 64 # 64x64 pixels icon
-    unless Dir.exists?(Rails.root + IMG_PATH)
+    unless Dir.exist?(Rails.root + IMG_PATH)
       FileUtils.mkdir_p(Rails.root + IMG_PATH)
     end
 
@@ -27,7 +27,7 @@ module Ketcherails
 
       if self.icon_path.present? # delete old icon file
         old_png = "public/images/templates/#{self.icon_path}"
-        File.rm old_png if File.exists? old_png
+        File.rm old_png if File.exist? old_png
       end
       self.icon_path = filename
     end

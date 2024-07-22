@@ -17,29 +17,25 @@ Gem::Specification.new do |s|
   s.files = Dir["{app,config,db,lib}/**/*", "LICENSE.txt", "Rakefile", "README.md"]
   s.test_files = Dir["spec/**/*"]
 
-  s.add_dependency "rails", "~> 5.2.0"
+  s.add_dependency "rails", "~> 7.1.1"
   s.add_dependency "jquery-rails"
-  s.add_dependency "nokogiri", ">= 1.10", "< 1.13"
+  s.add_dependency "nokogiri"
   s.add_dependency "haml-rails"
-  s.add_dependency "jquery-ui-rails", "~> 5.0.5"
+  s.add_dependency "jquery-ui-rails"
   s.add_dependency 'kaminari'
-  s.add_dependency 'bootstrap-kaminari-views', '0.0.5'
-  s.add_dependency 'paperclip', '~> 5.2.0'
-  s.add_dependency 'sprite-factory', '1.7.1'
+  s.add_dependency 'bootstrap-kaminari-views'
+  s.add_dependency 'kt-paperclip'
+  s.add_dependency 'sprite-factory'
   s.add_dependency 'httparty'
   s.add_dependency 'bootstrap-sass'
   s.add_dependency 'delayed_job_active_record'
   s.add_dependency 'daemons'
-  s.add_dependency 'grape', '< 2.0'
-  s.add_dependency 'grape-active_model_serializers', '~> 1.3.2'
-  s.add_dependency 'active_model_serializers', '< 0.10.0'
+  s.add_dependency 'grape'
+  s.add_dependency 'grape-active_model_serializers'
+  s.add_dependency 'active_model_serializers'
   s.add_dependency 'openbabel'
-  s.add_dependency 'mimemagic', '>= 0.3.10'
+  s.add_dependency 'mimemagic'
   s.add_dependency 'inchi-gem'
-
-
-  # s.add_dependency 'openbabel', '~> 2.4.90.1'#, git: 'https://github.com/ComPlat/openbabel-gem'
-  # s.add_dependency  'grape', '< 1.0.0'
 
 
   s.add_development_dependency "pg"

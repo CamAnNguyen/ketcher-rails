@@ -3,7 +3,7 @@ class MakeKetcherailsSprites < ApplicationJob
 
   SPRITES_PATH = "#{Rails.root}/public/images/sprites/"
 
-  unless Dir.exists? SPRITES_PATH
+  unless Dir.exist? SPRITES_PATH
     FileUtils.mkdir_p SPRITES_PATH
   end
 

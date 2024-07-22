@@ -15,13 +15,12 @@ if (!window.Prototype)
 if (!window.rnd)
 	throw new Error("rnd should be defined prior to loading this file");
 
-rnd.ElementTable = function (clientArea, opts, isTable)
-{
+rnd.ElementTable = function (clientArea, opts, isTable) {
 	opts = opts || {};
 	clientArea = $(clientArea);
 	clientArea.innerHTML = "";
 	var table = this;
-	this.onClick = opts.onClick || function(elemNum){
+	this.onClick = opts.onClick || function (elemNum) {
 		if (this.mode == 'single')
 			table.setElementSingle(elemNum);
 		else
@@ -38,7 +37,7 @@ rnd.ElementTable = function (clientArea, opts, isTable)
 	this.mode = 'single';
 
 	if (isTable) {
-		this.size = new util.Vec2((this.elemSz.x + this.spacing.x) * 18 + this.spacing.x, (this.elemSz.y + this.spacing.y) *9 + this.spacing.y);
+		this.size = new util.Vec2((this.elemSz.x + this.spacing.x) * 18 + this.spacing.x, (this.elemSz.y + this.spacing.y) * 9 + this.spacing.y);
 		clientArea.style.width = (this.size.x).toString() + 'px';
 		clientArea.style.height = (this.size.y).toString() + 'px';
 	}
@@ -55,14 +54,14 @@ rnd.ElementTable = function (clientArea, opts, isTable)
 	this.fontType = opts.fontType || "Arial";
 
 	this.frameAttrs = {
-			'fill':this.fillColor,
-			'stroke':this.frameColor,
-			'stroke-width':this.frameThickness
-		};
+		'fill': this.fillColor,
+		'stroke': this.frameColor,
+		'stroke-width': this.frameThickness
+	};
 	this.fontAttrs = {
-			'font-family': this.fontType,
-			'font-size': this.fontSize
-		};
+		'font-family': this.fontType,
+		'font-size': this.fontSize
+	};
 	this.items = {};
 	this.selectedLabels = util.Set.empty();
 	this.singleLabel = -1;
@@ -80,12 +79,12 @@ rnd.ElementTable.prototype.updateAtomProps = function () {
 			return;
 		var notList = this.mode == 'notlist';
 		var ids = util.Set.list(this.selectedLabels);
-		ids.sort(function(a, b){return a-b;});
+		ids.sort(function (a, b) { return a - b; });
 		this.atomProps = {
-			'label':'L#',
+			'label': 'L#',
 			'atomList': new chem.Struct.AtomList({
-					'notList': notList,
-					'ids': ids
+				'notList': notList,
+				'ids': ids
 			})
 		};
 	}
@@ -97,13 +96,13 @@ rnd.ElementTable.prototype.getAtomProps = function () {
 
 rnd.ElementTable.prototype.renderTable = function () {
 	var table = this;
-	chem.Element.elements.each(function(id, elem){
+	chem.Element.elements.each(function (id, elem) {
 		var centre = new util.Vec2(this.orig.x + (elem.xpos - 1) * (this.spacing.x + this.elemSz.x) + this.elemHalfSz.x + this.spacing.x, this.orig.y + (elem.ypos - 1) * (this.spacing.y + this.elemSz.y) + this.elemHalfSz.y + this.spacing.y);
 		var box = this.paper.rect(centre.x - this.elemHalfSz.x, centre.y - this.elemHalfSz.y, this.elemSz.x, this.elemSz.y, this.cornerRadius).attr(this.frameAttrs);
 		var label = this.paper.text(centre.x, centre.y, elem.label).attr(this.fontAttrs).attr('fill', elem.labelColor);
-		box.node.onclick = function () {table.onClick(id);};
-		label.node.onclick = function () {table.onClick(id);};
-		this.items[id] = {'box':box, 'label':label, 'selected':false};
+		box.node.onclick = function () { table.onClick(id); };
+		label.node.onclick = function () { table.onClick(id); };
+		this.items[id] = { 'box': box, 'label': label, 'selected': false };
 	}, this);
 };
 
@@ -115,20 +114,20 @@ rnd.ElementTable.prototype.renderSingle = function (element) {
 
 rnd.ElementTable.prototype.renderArrow = function () {
 	var margin = 4, hsz = 16, hext = 6, hw = 4;
-	this.items['arrow'] = this.paper.path("M{1},{3}L{2},{4}L{1},{5}M{0},{4}L{2},{4}", margin, 2 * hsz - hext - margin, 2 * hsz - margin, hsz - hw, hsz, hsz + hw).attr({'stroke': '#000','stroke-width': '2px'});
+	this.items['arrow'] = this.paper.path("M{1},{3}L{2},{4}L{1},{5}M{0},{4}L{2},{4}", margin, 2 * hsz - hext - margin, 2 * hsz - margin, hsz - hw, hsz, hsz + hw).attr({ 'stroke': '#000', 'stroke-width': '2px' });
 };
 
 rnd.ElementTable.prototype.renderPlus = function () {
 	var hsz = 16, hext = 9;
-	this.items['plus'] = this.paper.path("M{1},{0}L{1},{2}M{0},{1}L{2},{1}", hsz - hext, hsz, hsz + hext).attr({'stroke': '#000','stroke-width': '2px'});
+	this.items['plus'] = this.paper.path("M{1},{0}L{1},{2}M{0},{1}L{2},{1}", hsz - hext, hsz, hsz + hext).attr({ 'stroke': '#000', 'stroke-width': '2px' });
 };
 
 rnd.ElementTable.prototype.markSelected = function (id, selected) {
 	var item = this.items[id];
 	if (selected) {
-		item.box.attr('fill',this.fillColorSelected);
+		item.box.attr('fill', this.fillColorSelected);
 	} else {
-		item.box.attr('fill',this.fillColor);
+		item.box.attr('fill', this.fillColor);
 	}
 	item.selected = selected;
 };
@@ -152,7 +151,7 @@ rnd.ElementTable.prototype.setElementSelected = function (id, selected) {
 
 rnd.ElementTable.prototype.setMode = function (mode) {
 	if (mode == 'single') {
-		util.Set.each(this.selectedLabels, function(id){
+		util.Set.each(this.selectedLabels, function (id) {
 			this.markSelected(id, false);
 		}, this);
 		this.selectedLabels = util.Set.empty();
@@ -165,14 +164,14 @@ rnd.ElementTable.prototype.setMode = function (mode) {
 
 rnd.ElementTable.prototype.store = function () {
 	this.old = {
-		'selectedLabels' : util.Set.clone(this.selectedLabels),
+		'selectedLabels': util.Set.clone(this.selectedLabels),
 		'singleLabel': this.singleLabel,
-		'mode' : this.mode
+		'mode': this.mode
 	};
 };
 
 rnd.ElementTable.prototype.restore = function () {
-	util.Set.each(this.selectedLabels, function(id){
+	util.Set.each(this.selectedLabels, function (id) {
 		this.markSelected(id, false);
 	}, this);
 	if (this.singleLabel >= 0)
@@ -182,30 +181,30 @@ rnd.ElementTable.prototype.restore = function () {
 	if (this.old.mode == 'single') {
 		this.setElementSingle(this.old.singleLabel);
 	} else {
-		util.Set.each(this.old.selectedLabels, function(id){
+		util.Set.each(this.old.selectedLabels, function (id) {
 			this.markSelected(id, true);
 		}, this);
 		this.selectedLabels = util.Set.clone(this.old.selectedLabels);
 	}
-        $('elem_table_'+this.old.mode).checked=true;
+	$('elem_table_' + this.old.mode).checked = true;
 	this.updateAtomProps();
 };
 
-rnd.ElementTable.prototype.setSelection = function(selection) {
-    if (selection) {
-        util.Set.each(this.selectedLabels, function(id){
-            this.setElementSelected(id, false);
-        }, this);
-        this.setElementSingle(-1);
-        if (selection.label == 'L#') {
-            $(selection.atomList && selection.atomList.notList ? 'elem_table_notlist' : 'elem_table_list').click();
-            (selection.atomList.ids || []).each(function(id) {
-                this.setElementSelected(id, true);
-            }, this);
-        } else {
-            $('elem_table_single').click();
-            this.setElementSingle(chem.Element.getElementByLabel(selection.label) || -1);
-        }
-        this.updateAtomProps();
-    }
+rnd.ElementTable.prototype.setSelection = function (selection) {
+	if (selection) {
+		util.Set.each(this.selectedLabels, function (id) {
+			this.setElementSelected(id, false);
+		}, this);
+		this.setElementSingle(-1);
+		if (selection.label == 'L#') {
+			$(selection.atomList && selection.atomList.notList ? 'elem_table_notlist' : 'elem_table_list').click();
+			(selection.atomList.ids || []).each(function (id) {
+				this.setElementSelected(id, true);
+			}, this);
+		} else {
+			$('elem_table_single').click();
+			this.setElementSingle(chem.Element.getElementByLabel(selection.label) || -1);
+		}
+		this.updateAtomProps();
+	}
 };

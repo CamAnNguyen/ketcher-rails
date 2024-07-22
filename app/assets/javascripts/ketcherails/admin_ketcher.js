@@ -1,5 +1,4 @@
-
-getKetcher = function() {
+getKetcher = function () {
   var ketcherFrame = document.getElementById("ifKetcher");
 
   if (ketcherFrame && ("contentDocument" in ketcherFrame))
@@ -8,14 +7,14 @@ getKetcher = function() {
     return document.frames['ifKetcher'].window.ketcher;
 }
 
-showKetcherModal = function(entityName) {
+showKetcherModal = function (entityName) {
   var ketcher = getKetcher();
   var molfile = $('textarea#' + entityName + '_molfile').val();
   ketcher.setMolecule(molfile);
   $('#ketcherModal').modal('show');
 }
 
-saveStructure = function(entityName) {
+saveStructure = function (entityName) {
   var ketcher = getKetcher();
 
   var molfile = ketcher.getMolfile();
@@ -29,7 +28,7 @@ updateMolfileFromFileInput = function (e, entityName) {
   var file = $('input#' + entityName + '_file_molfile').val();
   var reader = new FileReader();
   reader.readAsText(e.files[0]);
-  reader.onload = function(e) {
+  reader.onload = function (e) {
     $('textarea#' + entityName + '_molfile').html(e.target.result);
   };
 }

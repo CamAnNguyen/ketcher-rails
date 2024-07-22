@@ -43,116 +43,107 @@
 //= require ketcherails/reaxys/reaxys.js
 
 ketcher = function () {
-    this.render = null;
+  this.render = null;
 };
 
 ketcher.version = "1.1-beta";
 
-ketcher.init = function (parameters, opt)
-{
-    document.title += ' v' + ketcher.version;
-	ketcher.button_areas = {};
-	var elemLabelOpts = {'fontSize':25};
-	ketcher.button_areas.atom_h = new rnd.ElementTable('atom_h', elemLabelOpts).renderSingle('H');
-	ketcher.button_areas.atom_c = new rnd.ElementTable('atom_c', elemLabelOpts).renderSingle('C');
-	ketcher.button_areas.atom_n = new rnd.ElementTable('atom_n', elemLabelOpts).renderSingle('N');
-	ketcher.button_areas.atom_o = new rnd.ElementTable('atom_o', elemLabelOpts).renderSingle('O');
-	ketcher.button_areas.atom_s = new rnd.ElementTable('atom_s', elemLabelOpts).renderSingle('S');
-	ketcher.button_areas.atom_p = new rnd.ElementTable('atom_p', elemLabelOpts).renderSingle('P');
-	ketcher.button_areas.atom_f = new rnd.ElementTable('atom_f', elemLabelOpts).renderSingle('F');
-	ketcher.button_areas.atom_cl = new rnd.ElementTable('atom_cl', elemLabelOpts).renderSingle('Cl');
-	ketcher.button_areas.atom_br = new rnd.ElementTable('atom_br', elemLabelOpts).renderSingle('Br');
-	ketcher.button_areas.atom_i = new rnd.ElementTable('atom_i', elemLabelOpts).renderSingle('I');
-	ketcher.button_areas.atom_table = new rnd.ElementTable('atom_table', elemLabelOpts).renderSingle('...');
-	ketcher.button_areas.atom_any = new rnd.ElementTable('atom_reagenerics', {'fontSize':9}).renderSingle('Generic\nGroups');
-	ui.init(parameters, opt);
+ketcher.init = function (parameters, opt) {
+  document.title += ' v' + ketcher.version;
+  ketcher.button_areas = {};
+  var elemLabelOpts = { 'fontSize': 25 };
+  ketcher.button_areas.atom_h = new rnd.ElementTable('atom_h', elemLabelOpts).renderSingle('H');
+  ketcher.button_areas.atom_c = new rnd.ElementTable('atom_c', elemLabelOpts).renderSingle('C');
+  ketcher.button_areas.atom_n = new rnd.ElementTable('atom_n', elemLabelOpts).renderSingle('N');
+  ketcher.button_areas.atom_o = new rnd.ElementTable('atom_o', elemLabelOpts).renderSingle('O');
+  ketcher.button_areas.atom_s = new rnd.ElementTable('atom_s', elemLabelOpts).renderSingle('S');
+  ketcher.button_areas.atom_p = new rnd.ElementTable('atom_p', elemLabelOpts).renderSingle('P');
+  ketcher.button_areas.atom_f = new rnd.ElementTable('atom_f', elemLabelOpts).renderSingle('F');
+  ketcher.button_areas.atom_cl = new rnd.ElementTable('atom_cl', elemLabelOpts).renderSingle('Cl');
+  ketcher.button_areas.atom_br = new rnd.ElementTable('atom_br', elemLabelOpts).renderSingle('Br');
+  ketcher.button_areas.atom_i = new rnd.ElementTable('atom_i', elemLabelOpts).renderSingle('I');
+  ketcher.button_areas.atom_table = new rnd.ElementTable('atom_table', elemLabelOpts).renderSingle('...');
+  ketcher.button_areas.atom_any = new rnd.ElementTable('atom_reagenerics', { 'fontSize': 9 }).renderSingle('Generic\nGroups');
+  ui.init(parameters, opt);
 };
 
-ketcher.getSmiles = function ()
-{
-    var saver = new chem.SmilesSaver();
-    return saver.saveMolecule(ui.ctab, true);
+ketcher.getSmiles = function () {
+  var saver = new chem.SmilesSaver();
+  return saver.saveMolecule(ui.ctab, true);
 };
 
-ketcher.getMolfile = function ()
-{
-    var saver = new chem.MolfileSaver();
-    return saver.saveMolecule(ui.ctab, true);
+ketcher.getMolfile = function () {
+  var saver = new chem.MolfileSaver();
+  return saver.saveMolecule(ui.ctab, true);
 };
 
-ketcher.getSVG = function ()
-{
-    var svg_data = '<?xml version="1.0"?>'
-    var wrapper = ui.client_area;
+ketcher.getSVG = function () {
+  var svg_data = '<?xml version="1.0"?>'
+  var wrapper = ui.client_area;
 
-    return svg_data.concat(wrapper.innerHTML);
+  return svg_data.concat(wrapper.innerHTML);
 };
 
-ketcher.setMolecule = function (mol_string)
-{
-    if (!Object.isString(mol_string))
-        return;
+ketcher.setMolecule = function (mol_string) {
+  if (!Object.isString(mol_string))
+    return;
 
-    ui.loadMolecule(mol_string);
+  ui.loadMolecule(mol_string);
 };
 
-ketcher.addFragment = function (mol_string)
-{
-    if (!Object.isString(mol_string))
-        return;
+ketcher.addFragment = function (mol_string, callback) {
+  if (!Object.isString(mol_string))
+    return;
 
-    ui.loadMolecule(mol_string, undefined, undefined, true);
+  ui.loadMolecule(mol_string, undefined, undefined, true);
 };
 
-ketcher.showMolfile = function (clientArea, molfileText, autoScale, hideImplicitHydrogen)
-{
-	return ketcher.showMolfileOpts(clientArea, molfileText, 75, {
-        'showSelectionRegions':false,
-        'showBondIds':false,
-        'showHalfBondIds':false,
-        'showLoopIds':false,
-        'showAtomIds':false,
-		'autoScale':autoScale||false,
-		'autoScaleMargin':4,
-		'hideImplicitHydrogen':hideImplicitHydrogen||false
-    });
+ketcher.showMolfile = function (clientArea, molfileText, autoScale, hideImplicitHydrogen) {
+  return ketcher.showMolfileOpts(clientArea, molfileText, 75, {
+    'showSelectionRegions': false,
+    'showBondIds': false,
+    'showHalfBondIds': false,
+    'showLoopIds': false,
+    'showAtomIds': false,
+    'autoScale': autoScale || false,
+    'autoScaleMargin': 4,
+    'hideImplicitHydrogen': hideImplicitHydrogen || false
+  });
 };
 
-ketcher.showMolfileOpts = function (clientArea, molfileText, bondLength, opts)
-{
-    this.render = new rnd.Render(clientArea, bondLength, opts);
-    if (molfileText)
-        this.render.setMolecule(chem.Molfile.parseCTFile(typeof(molfileText)=='string' ? molfileText.split('\n') : molfileText));
-    this.render.update();
-    return this.render;
+ketcher.showMolfileOpts = function (clientArea, molfileText, bondLength, opts) {
+  this.render = new rnd.Render(clientArea, bondLength, opts);
+  if (molfileText)
+    this.render.setMolecule(chem.Molfile.parseCTFile(typeof (molfileText) == 'string' ? molfileText.split('\n') : molfileText));
+  this.render.update();
+  return this.render;
 };
 
-ketcher.testSegment = function (clientArea)
-{
-    var sz = 600;
-    var bx = 50, by = 50, bw = sz, bh = sz;
+ketcher.testSegment = function (clientArea) {
+  var sz = 600;
+  var bx = 50, by = 50, bw = sz, bh = sz;
 
-    var b = new util.Box2Abs(bx, by, bx + bw, by + bh);
-    var c = new Raphael(clientArea);
+  var b = new util.Box2Abs(bx, by, bx + bw, by + bh);
+  var c = new Raphael(clientArea);
 
-    var list = [];
-    for (var i = 0; i < 100000; ++i) {
-        var a = new util.Vec2(Math.random() * sz + 50, Math.random() * sz + 50);
-        var b = new util.Vec2(Math.random() * sz + 50, Math.random() * sz + 50);
-        var add = true;
-        for (var j = 0; j < list.length; ++j) {
-            if (util.Vec2.segmentIntersection(a, b, list[j][0], list[j][1])) {
-                add = false;
-                break;
-            }
-        }
-        if (add)
-            list.push([a,b]);
-    }
-    c.rect(50, 50, sz, sz).attr({stroke:'#0f0'});
+  var list = [];
+  for (var i = 0; i < 100000; ++i) {
+    var a = new util.Vec2(Math.random() * sz + 50, Math.random() * sz + 50);
+    var b = new util.Vec2(Math.random() * sz + 50, Math.random() * sz + 50);
+    var add = true;
     for (var j = 0; j < list.length; ++j) {
-        c.path("M{0},{1}L{2},{3}",list[j][0].x,list[j][0].y,list[j][1].x,list[j][1].y).attr({'stroke-width':1, stroke:'#000'});
+      if (util.Vec2.segmentIntersection(a, b, list[j][0], list[j][1])) {
+        add = false;
+        break;
+      }
     }
+    if (add)
+      list.push([a, b]);
+  }
+  c.rect(50, 50, sz, sz).attr({ stroke: '#0f0' });
+  for (var j = 0; j < list.length; ++j) {
+    c.path("M{0},{1}L{2},{3}", list[j][0].x, list[j][0].y, list[j][1].x, list[j][1].y).attr({ 'stroke-width': 1, stroke: '#000' });
+  }
 }
 
 /*
