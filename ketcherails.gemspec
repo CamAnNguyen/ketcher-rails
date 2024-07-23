@@ -37,12 +37,9 @@ Gem::Specification.new do |s|
   s.add_dependency 'mimemagic'
   s.add_dependency 'inchi-gem'
 
-
-  s.add_development_dependency "pg"
-  s.add_development_dependency "sqlite3"
   s.add_development_dependency "grape"
   s.add_development_dependency "grape-swagger"
-  s.add_development_dependency "byebug"
+  s.add_development_dependency "debug"
   s.add_development_dependency "rspec"
   s.add_development_dependency 'bootstrap-generators', '~> 3.3.4'
   s.add_development_dependency 'bootstrap-sass'
