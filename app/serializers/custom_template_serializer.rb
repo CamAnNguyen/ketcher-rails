@@ -1,6 +1,4 @@
 class CustomTemplateSerializer < ActiveModel::Serializer
-  root false
-
   attributes :id, :molfile, :name, :icon_path, :sprite_class, :aid, :bid
 
   def aid

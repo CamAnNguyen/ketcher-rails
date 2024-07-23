@@ -1,6 +1,4 @@
 class CommonTemplateSerializer < ActiveModel::Serializer
-  root false
-
   attributes :molfile, :name, :icon,:sprite_class, :aid, :bid, :category,
              :template_category_id
 
