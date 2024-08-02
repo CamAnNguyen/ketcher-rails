@@ -13,13 +13,12 @@
 if (!window.chem || !chem.Struct)
 	throw new Error("Include MolData.js first");
 
-chem.Struct.prototype.calcConn = function (aid) {
-	var conn = 0;
-	var atom = this.atoms.get(aid);
-	var hasAromatic = false;
-	for (var i = 0; i < atom.neighbors.length; ++i) {
-		var hb = this.halfBonds.get(atom.neighbors[i]);
-		var bond = this.bonds.get(hb.bid);
+chem.Struct.prototype.calcConn = function (atom) {
+	let conn = 0;
+	for (let i = 0; i < atom.neighbors.length; ++i) {
+		const hb = this.halfBonds.get(atom.neighbors[i]);
+		const bond = this.bonds.get(hb.bid);
+
 		switch (bond.type) {
 			case chem.Struct.BOND.TYPE.SINGLE:
 				conn += 1;
@@ -31,19 +30,13 @@ chem.Struct.prototype.calcConn = function (aid) {
 				conn += 3;
 				break;
 			case chem.Struct.BOND.TYPE.AROMATIC:
-				conn += 1;
-				hasAromatic = true;
-				break;
-			case chem.Struct.BOND.TYPE.COORDINATION:
-				// conn += 0;
-				break;
+				if (atom.neighbors.length === 1) return [-1, true];
+				return [atom.neighbors.length, true];
 			default:
-				return -1;
+				return [-1, false];
 		}
 	}
-	if (hasAromatic)
-		conn += 1;
-	return conn;
+	return [conn, false];
 };
 
 chem.Struct.Atom.isHeteroAtom = function (label) {
@@ -291,56 +284,41 @@ chem.Struct.Atom.prototype.calcValence = function (connectionCount) {
 }
 
 chem.Struct.Atom.prototype.calcValenceMinusHyd = function (conn) {
-	var atom = this;
-	var charge = atom.charge;
-	var label = atom.label;
-	var elem = chem.Element.getElementByLabel(label);
-	if (elem == null)
-		throw new Error("Element " + label + " unknown");
-	if (elem < 0) { // query atom, skip
+	const charge = this.charge || 0;
+	const label = this.label;
+	const element = chem.Element.getElementByLabel(this.label);
+	if (!element) {
+		// query atom, skip
 		this.implicitH = 0;
-		return null;
+		return 0;
 	}
 
-	var groupno = chem.Element.elements.get(elem).group;
-	var rad = chem.Struct.radicalElectrons(atom.radical);
+	const groupno = chem.Element.elements.get(elem).group;
+	const rad = chem.Struct.radicalElectrons(this.radical);
 
-	if (groupno == 3) {
-		if (label == 'B' || label == 'Al' || label == 'Ga' || label == 'In') {
-			if (charge == -1)
-				if (rad + conn <= 4)
-					return rad + conn;
+	if (groupno === 3) {
+		if (label === 'B' || label === 'Al' || label === 'Ga' || label === 'In') {
+			if (charge === -1) {
+				if (rad + conn <= 4) return rad + conn;
+			}
 		}
-	}
-	else if (groupno == 5) {
-		if (label == 'N' || label == 'P') {
-			if (charge == 1)
-				return rad + conn;
-			if (charge == 2)
-				return rad + conn;
+	} else if (groupno === 5) {
+		if (label === 'N' || label === 'P') {
+			if (charge === 1) return rad + conn;
+			if (charge === 2) return rad + conn;
+		} else if (label === 'Sb' || label === 'Bi' || label === 'As') {
+			if (charge === 1) return rad + conn;
+			else if (charge === 2) return rad + conn;
 		}
-		else if (label == 'Sb' || label == 'Bi' || label == 'As') {
-			if (charge == 1)
-				return rad + conn;
-			else if (charge == 2)
-				return rad + conn;
+	} else if (groupno === 6) {
+		if (label === 'O') {
+			if (charge >= 1) return rad + conn;
+		} else if (label === 'S' || label === 'Se' || label === 'Po') {
+			if (charge === 1) return rad + conn;
 		}
-	}
-	else if (groupno == 6) {
-		if (label == 'O') {
-			if (charge >= 1)
-				return rad + conn;
-		}
-		else if (label == 'S' || label == 'Se' || label == 'Po') {
-			if (charge == 1)
-				return rad + conn;
-		}
-	}
-	else if (groupno == 7) {
-		if (label == 'Cl' || label == 'Br' ||
-			label == 'I' || label == 'At') {
-			if (charge == 1)
-				return rad + conn;
+	} else if (groupno === 7) {
+		if (label === 'Cl' || label === 'Br' || label === 'I' || label === 'At') {
+			if (charge === 1) return rad + conn;
 		}
 	}
 
@@ -348,24 +326,51 @@ chem.Struct.Atom.prototype.calcValenceMinusHyd = function (conn) {
 };
 
 chem.Struct.prototype.calcImplicitHydrogen = function (aid) {
-	var conn = this.calcConn(aid);
-	var atom = this.atoms.get(aid);
+	const atom = this.atoms.get(aid);
+	const charge = atom.charge || 0;
+	const [conn, isAromatic] = this.calcConn(atom);
+	let correctConn = conn;
 	atom.badConn = false;
-	if (conn < 0 || atom.isQuery()) {
+
+	if (isAromatic) {
+		if (atom.label === 'C' && charge === 0) {
+			if (conn === 3) {
+				atom.implicitH = - chem.Struct.radicalElectrons(atom.radical);
+				return;
+			}
+			if (conn === 2) {
+				atom.implicitH = 1 - chem.Struct.radicalElectrons(atom.radical);
+				return;
+			}
+		} else if (
+			(atom.label === 'O' && charge === 0) ||
+			(atom.label === 'N' && charge === 0 && conn === 3) ||
+			(atom.label === 'N' && charge === 1 && conn === 3) ||
+			(atom.label === 'S' && charge === 0 && conn === 3) ||
+			!atom.implicitH
+		) {
+			atom.implicitH = 0;
+			return;
+		} else if (!atom.hasImplicitH) {
+			correctConn++;
+		}
+	}
+
+	if (correctConn < 0 || atom.isQuery() || atom.attachmentPoints) {
 		atom.implicitH = 0;
 		return;
 	}
+
 	if (atom.explicitValence >= 0) {
-		var elem = chem.Element.getElementByLabel(atom.label);
-		atom.implicitH = 0;
-		if (elem != null) {
-			atom.implicitH = atom.explicitValence - atom.calcValenceMinusHyd(conn);
-			if (atom.implicitH < 0) {
-				atom.implicitH = 0;
-				atom.badConn = true;
-			}
+		const elem = chem.Element.getElementByLabel(atom.label);
+		atom.implicitH = elem
+			? atom.explicitValence - atom.calcValenceMinusHyd(correctConn)
+			: 0;
+		if (atom.implicitH < 0) {
+			atom.implicitH = 0;
+			atom.badConn = true;
 		}
 	} else {
-		atom.calcValence(conn);
+		atom.calcValence(correctConn);
 	}
 };
