@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'jquery-ui-rails'
   s.add_dependency 'kaminari'
   s.add_dependency 'bootstrap-kaminari-views'
+  s.add_dependency 'bootstrap-sass'
   s.add_dependency 'kt-paperclip'
   s.add_dependency 'sprite-factory'
   s.add_dependency 'httparty'

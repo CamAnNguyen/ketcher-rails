@@ -1,6 +1,7 @@
 module Ketcherails
   class Engine < ::Rails::Engine
     require 'jquery-ui-rails'
+    require 'bootstrap-sass'
     require 'kaminari'
     require 'bootstrap-kaminari-views'
     require 'paperclip'
